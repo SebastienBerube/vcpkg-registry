@@ -66,7 +66,7 @@ if(VCPKG_TARGET_IS_WINDOWS)
     project(dxc VERSION 0.1.2)
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
-	message("Hello from Seb!)
+	message("Hello from Seb!")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
     get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
