@@ -61,14 +61,16 @@ if(VCPKG_TARGET_IS_WINDOWS)
     # INVERTED_FEATURES
     # tbb   ROCKSDB_IGNORE_PACKAGE_TBB
     # )
-	message("Hello from Seb!")
-	message("seb: SOURCE_PATH=${SOURCE_PATH}")
+	message("SOURCE_PATH=${SOURCE_PATH}")
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
     project(dxc VERSION 0.1.2)
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
+	message("Hello from inner CMakeLists!")
+	message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
+	message("Hello from inner dxc-config.cmake!")
     get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
