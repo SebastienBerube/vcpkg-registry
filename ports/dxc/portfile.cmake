@@ -1,42 +1,11 @@
-# -------------
-
-# Common Ambient Variables:
-# CURRENT_BUILDTREES_DIR    = ${VCPKG_ROOT_DIR}\buildtrees\${PORT}
-# CURRENT_PACKAGES_DIR      = ${VCPKG_ROOT_DIR}\packages\${PORT}_${TARGET_TRIPLET}
-# CURRENT_PORT_DIR          = ${VCPKG_ROOT_DIR}\ports\${PORT}
-# CURRENT_INSTALLED_DIR     = ${VCPKG_ROOT_DIR}\installed\${TRIPLET}
-# DOWNLOADS                 = ${VCPKG_ROOT_DIR}\downloads
-# PORT                      = current port name (zlib, etc)
-# TARGET_TRIPLET            = current triplet (x86-windows, x64-windows-static, etc)
-# VCPKG_CRT_LINKAGE         = C runtime linkage type (static, dynamic)
-# VCPKG_LIBRARY_LINKAGE     = target library linkage type (static, dynamic)
-# VCPKG_ROOT_DIR            = <C:\path\to\current\vcpkg>
-# VCPKG_TARGET_ARCHITECTURE = target architecture (x64, x86, arm)
-# VCPKG_TOOLCHAIN           = ON OFF
-# TRIPLET_SYSTEM_ARCH       = arm x86 x64
-# BUILD_ARCH                = "Win32" "x64" "ARM"
-# MSBUILD_PLATFORM          = "Win32"/"x64"/${TRIPLET_SYSTEM_ARCH}
-# DEBUG_CONFIG              = "Debug Static" "Debug Dll"
-# RELEASE_CONFIG            = "Release Static"" "Release DLL"
-# VCPKG_TARGET_IS_WINDOWS
-# VCPKG_TARGET_IS_UWP
-# VCPKG_TARGET_IS_LINUX
-# VCPKG_TARGET_IS_OSX
-# VCPKG_TARGET_IS_FREEBSD
-# VCPKG_TARGET_IS_ANDROID
-# VCPKG_TARGET_IS_MINGW
-# VCPKG_TARGET_EXECUTABLE_SUFFIX
-# VCPKG_TARGET_STATIC_LIBRARY_SUFFIX
-# VCPKG_TARGET_SHARED_LIBRARY_SUFFIX
-#
-# See additional helpful variables in /docs/maintainers/vcpkg_common_definitions.md
+# See: https://github.com/microsoft/vcpkg/blob/master/scripts/templates/portfile.in.cmake
 
 # # Specifies if the port install should fail immediately given a condition
 # vcpkg_fail_port_install(MESSAGE "dxc currently only supports Linux and Windows platforms" ON_TARGET "Windows")
 if(VCPKG_TARGET_IS_WINDOWS)
     vcpkg_download_distfile(ARCHIVE
-        URLS "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2112/dxc_2021_12_08.zip"
-        FILENAME "dxc_2021_12_08.zip"
+        URLS "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.7.2212.1/dxc_2023_03_01.zip"
+        FILENAME "dxc_2023_03_01.zip"
         SHA512 e9b36e896c1d47b39b648adbecf44da7f8543216fd1df539760f0c591907aea081ea6bfc59eb927073aaa1451110c5dc63003546509ff84c9e4445488df97c27
     )
     vcpkg_extract_source_archive_ex(
@@ -63,7 +32,7 @@ if(VCPKG_TARGET_IS_WINDOWS)
     # )
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
-    project(dxc VERSION 0.1.2)
+    project(dxc VERSION 1.7.2212)
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
@@ -94,7 +63,7 @@ elseif(VCPKG_TARGET_IS_LINUX)
     set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR})
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
-    project(dxc VERSION 0.1.2)
+    project(dxc VERSION 1.7.2212)
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
     if("$ENV{VULKAN_SDK}" STREQUAL "")

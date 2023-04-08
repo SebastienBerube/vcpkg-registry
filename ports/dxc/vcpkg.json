@@ -1,6 +1,6 @@
 {
     "name": "dxc",
-    "version-string": "0.1.2",
-    "description": "Unofficial DX Shader Compiler",
+    "version-string": "1.7.2212",
+    "description": "Microsoft’s open source HLSL compiler ",
     "homepage": "https://github.com/microsoft/DirectXShaderCompiler"
 }
