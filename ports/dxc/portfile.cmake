@@ -61,6 +61,8 @@ if(VCPKG_TARGET_IS_WINDOWS)
     # INVERTED_FEATURES
     # tbb   ROCKSDB_IGNORE_PACKAGE_TBB
     # )
+	message("Hello from Seb!")
+	message("seb: SOURCE_PATH=${SOURCE_PATH}")
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
     project(dxc VERSION 0.1.2)
