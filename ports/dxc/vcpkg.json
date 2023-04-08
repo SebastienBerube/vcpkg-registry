@@ -1,0 +1,6 @@
+{
+    "name": "dxc",
+    "version-string": "0.1.2",
+    "description": "Unofficial DX Shader Compiler",
+    "homepage": "https://github.com/microsoft/DirectXShaderCompiler"
+}
