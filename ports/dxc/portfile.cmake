@@ -33,8 +33,9 @@
 
 # # Specifies if the port install should fail immediately given a condition
 # vcpkg_fail_port_install(MESSAGE "dxc currently only supports Linux and Windows platforms" ON_TARGET "Windows")
+message("[dxc] Running portfile.cmake...")
 if(VCPKG_TARGET_IS_WINDOWS)
-    vcpkg_download_distfile(ARCHIVE
+	vcpkg_download_distfile(ARCHIVE
         URLS "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2112/dxc_2021_12_08.zip"
         FILENAME "dxc_2021_12_08.zip"
         SHA512 e9b36e896c1d47b39b648adbecf44da7f8543216fd1df539760f0c591907aea081ea6bfc59eb927073aaa1451110c5dc63003546509ff84c9e4445488df97c27
@@ -61,16 +62,16 @@ if(VCPKG_TARGET_IS_WINDOWS)
     # INVERTED_FEATURES
     # tbb   ROCKSDB_IGNORE_PACKAGE_TBB
     # )
-	message("SOURCE_PATH=${SOURCE_PATH}")
+	message("[dxc] Writing file: ${SOURCE_PATH}/CMakeLists.txt")
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
-    project(dxc VERSION 0.1.2)
+	project(dxc VERSION 0.1.2)
+    message("[dxc] Running CMakeLists.txt...")
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
-	message("Hello from inner CMakeLists!")
-	message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
+	message("[dxc] Writing file: ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
-	message("Hello from inner dxc-config.cmake!")
+	message("[dxc] Running dxc-config.cmake...")
     get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
