@@ -1,59 +1,30 @@
-# -------------
+# See template here: 
+# https://github.com/microsoft/vcpkg/blob/master/scripts/templates/portfile.in.cmake
 
-# Common Ambient Variables:
-# CURRENT_BUILDTREES_DIR    = ${VCPKG_ROOT_DIR}\buildtrees\${PORT}
-# CURRENT_PACKAGES_DIR      = ${VCPKG_ROOT_DIR}\packages\${PORT}_${TARGET_TRIPLET}
-# CURRENT_PORT_DIR          = ${VCPKG_ROOT_DIR}\ports\${PORT}
-# CURRENT_INSTALLED_DIR     = ${VCPKG_ROOT_DIR}\installed\${TRIPLET}
-# DOWNLOADS                 = ${VCPKG_ROOT_DIR}\downloads
-# PORT                      = current port name (zlib, etc)
-# TARGET_TRIPLET            = current triplet (x86-windows, x64-windows-static, etc)
-# VCPKG_CRT_LINKAGE         = C runtime linkage type (static, dynamic)
-# VCPKG_LIBRARY_LINKAGE     = target library linkage type (static, dynamic)
-# VCPKG_ROOT_DIR            = <C:\path\to\current\vcpkg>
-# VCPKG_TARGET_ARCHITECTURE = target architecture (x64, x86, arm)
-# VCPKG_TOOLCHAIN           = ON OFF
-# TRIPLET_SYSTEM_ARCH       = arm x86 x64
-# BUILD_ARCH                = "Win32" "x64" "ARM"
-# MSBUILD_PLATFORM          = "Win32"/"x64"/${TRIPLET_SYSTEM_ARCH}
-# DEBUG_CONFIG              = "Debug Static" "Debug Dll"
-# RELEASE_CONFIG            = "Release Static"" "Release DLL"
-# VCPKG_TARGET_IS_WINDOWS
-# VCPKG_TARGET_IS_UWP
-# VCPKG_TARGET_IS_LINUX
-# VCPKG_TARGET_IS_OSX
-# VCPKG_TARGET_IS_FREEBSD
-# VCPKG_TARGET_IS_ANDROID
-# VCPKG_TARGET_IS_MINGW
-# VCPKG_TARGET_EXECUTABLE_SUFFIX
-# VCPKG_TARGET_STATIC_LIBRARY_SUFFIX
-# VCPKG_TARGET_SHARED_LIBRARY_SUFFIX
-#
-# See additional helpful variables in /docs/maintainers/vcpkg_common_definitions.md
-
-# # Specifies if the port install should fail immediately given a condition
-# vcpkg_fail_port_install(MESSAGE "dxc currently only supports Linux and Windows platforms" ON_TARGET "Windows")
 message("[dxc] Running portfile.cmake...")
+
+# ------------------------------------------------
+# Download and extract files from source archive
+# ------------------------------------------------
+
+# Also consider vcpkg_from_github()
+vcpkg_download_distfile(ARCHIVE
+    URLS "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2112/dxc_2021_12_08.zip"
+    FILENAME "dxc_2021_12_08.zip"
+    SHA512 e9b36e896c1d47b39b648adbecf44da7f8543216fd1df539760f0c591907aea081ea6bfc59eb927073aaa1451110c5dc63003546509ff84c9e4445488df97c27
+)
+
+message("[dxc] vcpkg_extract_source_archive_ex ARCHIVE=${ARCHIVE}")
+vcpkg_extract_source_archive_ex(
+    OUT_SOURCE_PATH SOURCE_PATH
+    ARCHIVE ${ARCHIVE}
+    NO_REMOVE_ONE_LEVEL # Skip removing the top level directory of the archive.
+)
+
+# ------------------------------------------------
+# Create CMakeLists.txt for Windows & Linux
+# ------------------------------------------------
 if(VCPKG_TARGET_IS_WINDOWS)
-	vcpkg_download_distfile(ARCHIVE
-        URLS "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2112/dxc_2021_12_08.zip"
-        FILENAME "dxc_2021_12_08.zip"
-        SHA512 e9b36e896c1d47b39b648adbecf44da7f8543216fd1df539760f0c591907aea081ea6bfc59eb927073aaa1451110c5dc63003546509ff84c9e4445488df97c27
-    )
-    vcpkg_extract_source_archive_ex(
-        OUT_SOURCE_PATH SOURCE_PATH
-        ARCHIVE ${ARCHIVE}
-        NO_REMOVE_ONE_LEVEL
-
-        # (Optional) A friendly name to use instead of the filename of the archive (e.g.: a version number or tag).
-        # REF 1.0.0
-        # (Optional) Read the docs for how to generate patches at:
-        # https://github.com/Microsoft/vcpkg/blob/master/docs/examples/patching.md
-        # PATCHES
-        # 001_port_fixes.patch
-        # 002_more_port_fixes.patch
-    )
-
     # # Check if one or more features are a part of a package installation.
     # # See /docs/maintainers/vcpkg_check_features.md for more details
     # vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
@@ -62,16 +33,16 @@ if(VCPKG_TARGET_IS_WINDOWS)
     # INVERTED_FEATURES
     # tbb   ROCKSDB_IGNORE_PACKAGE_TBB
     # )
-	message("[dxc] Writing file: ${SOURCE_PATH}/CMakeLists.txt")
+    message("[dxc] Writing file: ${SOURCE_PATH}/CMakeLists.txt")
     file(WRITE ${SOURCE_PATH}/CMakeLists.txt [==[
     cmake_minimum_required(VERSION 3.12)
-	project(dxc VERSION 0.1.2)
+    project(dxc VERSION 0.1.2)
     message("[dxc] Running CMakeLists.txt...")
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
-	message("[dxc] Writing file: ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake")
+    message("[dxc] Writing file: ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
-	message("[dxc] Running dxc-config.cmake...")
+    message("[dxc] Running dxc-config.cmake...")
     get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
@@ -138,18 +109,22 @@ elseif(VCPKG_TARGET_IS_LINUX)
     ]==])
 endif()
 
+message("[dxc] vcpkg_configure_cmake log =${CURRENT_BUILDTREES_DIR}/${LOGFILE_BASE}")
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
 )
 
+message("[dxc] vcpkg_install_cmake log =${CURRENT_BUILDTREES_DIR}/${LOGFILE_BASE}")
 vcpkg_install_cmake()
 
 # # Moves all .cmake files from /debug/share/dxc/ to /share/dxc/
 # # See /docs/maintainers/vcpkg_fixup_cmake_targets.md for more details
 # vcpkg_fixup_cmake_targets(CONFIG_PATH cmake TARGET_PATH share/dxc)
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
+message("[dxc] Skipped removing: ${CURRENT_PACKAGES_DIR}/debug/include")
+# file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+message("[dxc] Skipped removing: ${CURRENT_PACKAGES_DIR}/debug/share")
+# file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
 
 if(VCPKG_TARGET_IS_LINUX)
     # We must modify the support/winadapter.h header to actually be able to compile
@@ -159,6 +134,7 @@ if(VCPKG_TARGET_IS_LINUX)
 endif()
 
 # Handle copyright (copied verbatim from github.com/microsoft/DirectXShaderCompiler)
+# D:\Dev\Perso\GitHub\dxc-hlsl-2-spirv-test\vcpkg_installed\x64-windows\share\dxc
 file(WRITE ${CURRENT_PACKAGES_DIR}/share/dxc/copyright [=[
 ==============================================================================
 LLVM Release License
