@@ -47,6 +47,12 @@ if(VCPKG_TARGET_IS_WINDOWS)
     message("[dxc] Writing file: ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake [=[
     message("[dxc] Running dxc-config.cmake...")
+    
+    # See similar code in :
+    #     - [project]\vcpkg_installed\x64-windows\share\beicode\beicode-targets.cmake
+    #     - [project]\vcpkg_installed\x64-windows\share\beicode\beicode-config.cmake
+    # Boilerplate code for backing up 2 levels, e.g.
+    #    [project]/vcpkg_installed/x64-windows/share/dxc -> [project]/vcpkg_installed/x64-windows
     get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
     get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
@@ -54,6 +60,9 @@ if(VCPKG_TARGET_IS_WINDOWS)
     set(_IMPORT_PREFIX "")
     endif()
     add_library(dxc::dxc SHARED IMPORTED)
+	message("[dxc] set target include path : ${_IMPORT_PREFIX}/include")
+	message("[dxc] set target lib path : ${_IMPORT_PREFIX}/lib")
+	message("[dxc] set target import location : ${_IMPORT_PREFIX}/bin/dxcompiler.dll")
     set_target_properties(dxc::dxc PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
         INTERFACE_LINK_DIRECTORIES "${_IMPORT_PREFIX}/lib"
@@ -61,6 +70,15 @@ if(VCPKG_TARGET_IS_WINDOWS)
         IMPORTED_IMPLIB   ${_IMPORT_PREFIX}/lib/dxcompiler.lib
     )
     ]=])
+    
+	# Paths example:
+    # CMAKE_CURRENT_BINARY_DIR=%VCPKG_PATH%/buildtrees/dxc/x64-windows-dbg
+    # CMAKE_INSTALL_DATADIR=share
+    # CMAKE_CURRENT_LIST_DIR=%VCPKG_PATH%/buildtrees/dxc/src/2021_12_08-9d706b8711.clean
+    #
+	# Note : install() copies the files and configures the project for them.
+	# Copy source location is %VCPKG_PATH%/buildtrees/dxc/src/
+	# Destination path example: [project]/vcpkg_installed/x64-windows/share
     install(
         FILES
             ${CMAKE_CURRENT_BINARY_DIR}/dxc-config.cmake
@@ -123,14 +141,13 @@ vcpkg_configure_cmake(
 message("   [dxc] vcpkg_install_cmake log =${CURRENT_BUILDTREES_DIR}/${LOGFILE_BASE}")
 vcpkg_install_cmake()
 
-# # Moves all .cmake files from /debug/share/dxc/ to /share/dxc/
-# # See /docs/maintainers/vcpkg_fixup_cmake_targets.md for more details
-# vcpkg_fixup_cmake_targets(CONFIG_PATH cmake TARGET_PATH share/dxc)
-
-message("   [dxc] Skipped removing: ${CURRENT_PACKAGES_DIR}/debug/include")
-# file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
-message("   [dxc] Skipped removing: ${CURRENT_PACKAGES_DIR}/debug/share")
-# file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
+# Moves all .cmake files from /debug/share/dxc/ to /share/dxc/
+# See /docs/maintainers/vcpkg_fixup_cmake_targets.md for more details
+# vcpkg_fixup_cmake_targets()
+# message("   [dxc] Skipped removing: ${CURRENT_PACKAGES_DIR}/debug/include")
+# Consider using vcpkg_fixup_cmake_targets()
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
 
 if(VCPKG_TARGET_IS_LINUX)
     # We must modify the support/winadapter.h header to actually be able to compile
@@ -151,6 +168,6 @@ vcpkg_download_distfile(
     SHA512 7589f152ebc3296dca1c73609a2a23a911b8fc0029731268a6151710014d82005a868c85c8249219f060f64ab1ddecdddff5ed6ea34ff509f63ea3e42bbbf47e
 )
 
-message("   [dxc] LICENSE_FILE_PATH=${LICENSE_FILE_PATH}")
+message("   [dxc] Source LICENSE_FILE_PATH=${LICENSE_FILE_PATH}")
 vcpkg_install_copyright(FILE_LIST "${LICENSE_FILE_PATH}")
 message("   [dxc] output copyright file=${CURRENT_PACKAGES_DIR}/share/${PORT}")
